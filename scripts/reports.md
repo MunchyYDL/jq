@@ -23,6 +23,18 @@ aws dynamodb scan \
      > ./input/dynamo.json
 ```
 
+
+Exporting from the vehicle-api-data table in ICP
+
+```shell
+aws dynamodb scan \
+     --table-name 'vehicle-api-data' \
+     --projection-expression 'vin, internalCar, market, modelYear, pno34, structureWeek' \
+     > ./input/dynamo.json
+```
+
+---
+
 ## Unmarshalling
 
 ```shell
@@ -114,6 +126,18 @@ jq '
 ' ./input/data.json > ./output/cars-grouped-models-count.json
 ```
 
+### Report - All VINS for a specific model
+
+This filters the list of cars on a specific model, and outputs the vins to a list.
+
+```shell
+jq '
+  import "scripts/funcs" as f;
+  f::model_ps4 | f::proj_vin_array
+' ./input/data.json > ./input/cars-ps4.json
+```
+
+
 ---
 
 ## Reports - Misc
@@ -149,3 +173,13 @@ jq -r '
 ' ./output/all-vins.json > ./output/all-vins.txt
 ```
 
+
+
+### ICP - CarVis Test
+
+```shell
+jq '
+  import "scripts/funcs" as f;
+  [.[] | select(.internalCar) | {vin, market, modelYear, pno34, structureWeek}] | sort
+' ./input/data.json > ./output/vehicles.json
+```

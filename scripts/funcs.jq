@@ -1,5 +1,4 @@
   ## From AWS DynamoDB-JSON to JSON
-
   def unmarshal:
     if type == "object" then
       if has("S") then . = .S
@@ -12,7 +11,7 @@
     map(.owners |= if . == null then [] else . end);
 
   def init:
-    [ .Items[] | walk(unmarshal) ] | nonull;
+    [ .Items[] | walk(unmarshal) ];
 
 
   ## Filters - Owners
@@ -69,6 +68,26 @@
     | map({ ("model_" + (first | tostring)): (. | length) })
     | add;
 
+  def grouped_regno:
+    map(.registerNo | length)
+    | group_by(.)
+    | map({ ("regno_" + (first | tostring)): (. | length) })
+    | add;
+
+  def grouped_primary_driver:
+    map(.primaryDriver | length)
+    | group_by(.)
+    | map({ (first | tostring): (. | length) })
+    | add;
+
+
+  # def grouped_structureWeek:
+  #   map(.structureWeek)
+  #   | group_by(.)
+  #   | map({ ("model_" + (first | tostring)): (. | length) })
+  #   | add;
+
+
   ### Projections - data
 
   def proj_owner:
@@ -93,6 +112,13 @@
       vin: .vin,
       owners: (.owners | map(proj_owner) | sort_by(.registeredAt)),
       primaryDriver: .primaryDriver
+    })
+    | sort_by(.vin);
+
+  def proj_structure_week:
+    map({
+      vin: .vin,
+      structureWeek: .structureWeek
     })
     | sort_by(.vin);
 
