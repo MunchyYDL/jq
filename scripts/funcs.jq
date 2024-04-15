@@ -4,11 +4,13 @@
       if has("S") then . = .S
       elif has("L") then . = .L
       elif has("M") then . = .M
+      elif has("N") then . = .N
+      elif has("BOOL") then . = .BOOL
       else . end
     else . end;
 
-  def nonull:
-    map(.owners |= if . == null then [] else . end);
+  def not_null(f):
+    map(f |= if . == null then [] else . end);
 
   def init:
     [ .Items[] | walk(unmarshal) ];
